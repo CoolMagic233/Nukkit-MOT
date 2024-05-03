@@ -49,8 +49,13 @@ public class BlockMobSpawner extends BlockSolid {
     }
 
     @Override
-    public boolean breaksWhenMoved() {
-        return true;
+    public boolean canBePushed() {
+        return false;
+    }
+
+    @Override
+    public boolean canBePulled() {
+        return false;
     }
 
     @Override

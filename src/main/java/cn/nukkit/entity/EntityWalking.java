@@ -1,6 +1,8 @@
 package cn.nukkit.entity;
 
+import cn.nukkit.Server;
 import cn.nukkit.block.*;
+import cn.nukkit.entity.mob.*;
 import cn.nukkit.entity.passive.EntityLlama;
 import cn.nukkit.entity.passive.EntitySkeletonHorse;
 import cn.nukkit.level.format.FullChunk;
@@ -76,6 +78,7 @@ public abstract class EntityWalking extends BaseEntity {
             this.moveTime = Utils.rand(100, 200);
             this.target = this.add(Utils.rand() ? x : -x, 0, Utils.rand() ? z : -z);
         }
+
     }
 
     protected boolean checkJump(double dx, double dz) {
@@ -121,6 +124,21 @@ public abstract class EntityWalking extends BaseEntity {
         return false;
     }
 
+    protected boolean isHostileMob(Entity entity){
+        return entity instanceof EntityEnderman ||
+                entity instanceof EntitySkeleton ||
+                entity instanceof EntityWitherSkeleton ||
+                entity instanceof EntityZombie ||
+                entity instanceof EntityZombiePigman ||
+                entity instanceof EntityCreeper ||
+                entity instanceof EntitySpider ||
+                entity instanceof EntityCaveSpider ||
+                entity instanceof EntitySlime ||
+                entity instanceof EntityMagmaCube ||
+                entity instanceof EntityDrowned ||
+                entity instanceof EntityStray;
+    }
+
     @Override
     public Vector3 updateMove(int tickDiff) {
         if (!this.isInTickingRange()) {
@@ -132,8 +150,6 @@ public abstract class EntityWalking extends BaseEntity {
                 this.move(this.motionX, this.motionY, this.motionZ);
                 if (this.isDrowned && this.isInsideOfWater()) {
                     this.motionY -= this.getGravity() * 0.3;
-                } else {
-                    this.motionY -= this.getGravity();
                 }
                 this.motionY -= this.getGravity();
                 this.updateMovement();
@@ -211,6 +227,15 @@ public abstract class EntityWalking extends BaseEntity {
                             this.motionZ = this.getSpeed() * moveMultiplier * 0.15 * (z / diff);
                         }
                     }
+
+                    if (!isHostileMob(this)){
+                        if (onGround){
+                            if (getLevel().getBlock(new Vector3(this.x + this.motionX,this.y - 2 , this.z + this.motionZ)).getId() == Block.AIR){
+                                return null;
+                            }
+                        }
+                    }
+
                     if ((this.passengers.isEmpty() || this instanceof EntityLlama) && (this.stayTime <= 0 || Utils.rand())) {
                         this.setBothYaw(FastMath.toDegrees(-FastMath.atan2(x / diff, z / diff)));
                     }
